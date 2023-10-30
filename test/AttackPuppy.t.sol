@@ -29,10 +29,6 @@ contract PuppyRaffleTest is Test {
         );
     }
 
-    //////////////////////
-    /// EnterRaffle    ///
-    /////////////////////
-
     function testCanEnterRaffle() public {
         address[] memory players = new address[](1);
         players[0] = playerOne;
@@ -41,11 +37,13 @@ contract PuppyRaffleTest is Test {
     }
 
     function testReenterAttack() public {
-        uint256 prevBalance = attacker.balance;
+        // a new player enters the raffle
         address[] memory players = new address[](1);
         players[0] = playerOne;
         puppyRaffle.enterRaffle{value: entranceFee}(players);
+        // attacker contract drains the money by entering and refunding recursively
+        uint256 prevBalance = address(attackPuppyRaffle).balance;
         attackPuppyRaffle.attack();
-        assertEq(address(attackPuppyRaffle).balance, prevBalance + entranceFee + entranceFee);
+        assertEq(address(attackPuppyRaffle).balance, prevBalance + entranceFee);
     }
 }
